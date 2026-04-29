@@ -17,6 +17,12 @@ endif()
 # Create your game executable target as usual
 if(WIN32)
     add_executable(sdl3_teste WIN32)
+
+    add_custom_command(
+        TARGET sdl3_teste POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:sdl3_teste>
+        VERBATIM
+    )
 else()
     add_executable(sdl3_teste)
 endif()
