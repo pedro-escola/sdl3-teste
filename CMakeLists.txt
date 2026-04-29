@@ -25,6 +25,12 @@ if(WIN32)
     )
 else()
     add_executable(sdl3_teste)
+
+    add_custom_command(
+        TARGET sdl3_teste POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_SONAME_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:sdl3_teste>
+        VERBATIM
+    )
 endif()
 
 target_sources(sdl3_teste

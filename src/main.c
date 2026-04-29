@@ -1,59 +1,34 @@
 
+#define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-SDL_Window *gWindow = NULL;
+static SDL_Window *gWindow = NULL;
+static SDL_Renderer *gRenderer = NULL;
 
-bool init() {
-    bool success = SDL_Init(SDL_INIT_VIDEO);
-    if (!success) {
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Initialization failed! Cuz: %s\n", SDL_GetError());
+        return SDL_APP_FAILURE;
     }
 
-    return success;
-}
-
-bool makeWindow() {
     const int kScreenWidth = 640;
     const int kScreenHeight = 480;
 
-    gWindow = SDL_CreateWindow("SDL3 Teste", kScreenWidth, kScreenHeight, 0);
-    if (gWindow == NULL) {
+    if (!SDL_CreateWindowAndRenderer("SDL3 Teste", kScreenWidth, kScreenHeight, 0, &gWindow, &gRenderer)) {
         SDL_Log("Window creation failed! Cuz: %s\n", SDL_GetError());
-        return false;
+        return SDL_APP_FAILURE;
     }
 
-    return true;
+    return SDL_APP_CONTINUE;
 }
 
-void loop() {
-    bool quit = false;
-
-    SDL_Event e;
-    SDL_zero(e);
-    while (!quit) {
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_EVENT_QUIT) {
-                quit = true;
-            }
-        }
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
+    if (event->type == SDL_EVENT_QUIT) {
+        return SDL_APP_SUCCESS;
     }
+    return SDL_APP_CONTINUE;
 }
 
-void end() {
-    SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
-
-    SDL_Quit();
-}
-
-int main(int argc, char** argv) {
-    if (!init()) { return -1; }
-
-    if (!makeWindow()) { return -2; }
-
-    loop();
-
-    end();
-    return 0;
-}
+SDL_AppResult SDL_AppIterate(void *appstate) {}
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {}
